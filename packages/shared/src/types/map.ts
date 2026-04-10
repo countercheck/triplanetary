@@ -1,11 +1,17 @@
-export type HexType = 'space' | 'gravity' | 'planet' | 'asteroid' | 'clandestine';
+export type HexType =
+  | "space"
+  | "gravity"
+  | "planet"
+  | "asteroid"
+  | "clandestine";
 
 export interface HexEntry {
   type: HexType;
   body?: string;
   offset?: [number, number];
   manual?: boolean;
-  weak?: boolean;
+  weak?: boolean; // gravity hexes: weak gravity rule applies (Luna/Io adjacent hexes)
+  weakGravity?: boolean; // planet hexes: the body itself is a weak-gravity body (Luna, Io)
   coloredAsteroids?: string[];
 }
 
@@ -29,7 +35,7 @@ export interface HexData {
     name: string;
     version: string;
     hexSize: number;
-    orientation: 'pointy' | 'flat';
+    orientation: "pointy" | "flat";
   };
   bodies: Record<string, BodyEntry>;
   hexes: Record<string, HexEntry>;
