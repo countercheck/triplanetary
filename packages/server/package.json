@@ -2,9 +2,8 @@
   "name": "@triplanetary/server",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "ts-node --transpile-only --project tsconfig.json src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "vitest run",
@@ -13,6 +12,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@koa/router": "^13.1.0",
     "@triplanetary/shared": "workspace:*",
     "bcryptjs": "^3.0.0",
     "boardgame.io": "^0.50.2",
@@ -21,7 +21,6 @@
     "koa": "^2.16.1",
     "koa-bodyparser": "^4.4.1",
     "koa-passport": "^6.0.0",
-    "@koa/router": "^13.1.0",
     "koa-session": "^7.0.2",
     "passport-local": "^1.0.0",
     "pg": "^8.14.0"
@@ -31,14 +30,15 @@
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-passport": "^6.0.3",
-    "@types/koa__router": "^12.0.5",
     "@types/koa-session": "^6.4.5",
+    "@types/koa__router": "^12.0.5",
     "@types/node": "^22.0.0",
     "@types/passport-local": "^1.0.38",
     "@types/pg": "^8.11.0",
     "@types/supertest": "^6.0.0",
     "drizzle-kit": "^0.31.10",
     "supertest": "^7.1.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.0",
     "typescript": "^5.8.0",
     "vitest": "^3.1.0"

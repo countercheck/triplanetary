@@ -1,5 +1,5 @@
 import type { Game } from 'boardgame.io';
-import type { TriplanetaryState } from '../types/game.js';
+import type { TriplanetaryState } from '../types/game';
 
 export const TriplanetaryGame: Game<TriplanetaryState> = {
   name: 'triplanetary',

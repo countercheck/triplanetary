@@ -1,6 +1,6 @@
 import koaSession from 'koa-session';
 import type Koa from 'koa';
-import { pool } from '../../db/client.js';
+import { pool } from '../../db/client';
 
 // pg-backed session store compatible with koa-session external store interface.
 // The `session` table is created in the initial migration.

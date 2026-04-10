@@ -2,8 +2,8 @@ import Router from '@koa/router';
 import passport from 'koa-passport';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
-import { db } from '../../db/client.js';
-import { users } from '../../db/schema.js';
+import { db } from '../../db/client';
+import { users } from '../../db/schema';
 
 const router = new Router();
 

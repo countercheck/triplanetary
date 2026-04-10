@@ -2,8 +2,8 @@ import passport from 'koa-passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
-import { db } from '../../db/client.js';
-import { users } from '../../db/schema.js';
+import { db } from '../../db/client';
+import { users } from '../../db/schema';
 
 passport.use(
   new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
