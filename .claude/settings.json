@@ -4,7 +4,9 @@
       "Bash(pnpm --filter @triplanetary/server db:migrate)",
       "Bash(DATABASE_URL=postgresql://triplanetary:triplanetary@localhost:5432/triplanetary pnpm db:migrate)",
       "Bash(DATABASE_URL=postgresql://triplanetary:triplanetary@localhost:5432/triplanetary ./node_modules/.bin/drizzle-kit migrate)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(pnpm --filter @triplanetary/server test)",
+      "Bash(pnpm view:*)"
     ]
   }
 }
