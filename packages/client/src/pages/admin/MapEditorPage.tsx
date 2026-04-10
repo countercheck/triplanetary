@@ -1,10 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { HexGrid } from '../../components/map/HexGrid';
 import { EditorToolbar } from './EditorToolbar';
 import { HexInspector } from './HexInspector';
 import { BodyPicker } from './BodyPicker';
 import { BasePicker } from './BasePicker';
 import { useMapEditor } from '../../hooks/useMapEditor';
+import { useMap, useCreateMap, useUpdateMap } from '../../hooks/useMaps';
 import { computeGravity } from '@triplanetary/shared';
 import type { HexData, BodyEntry } from '@triplanetary/shared';
 
@@ -19,9 +21,22 @@ const Q_RANGE: [number, number] = [-12, 14];
 const R_RANGE: [number, number] = [-10, 12];
 
 export default function MapEditorPage() {
+  const [searchParams] = useSearchParams();
+  const mapId = searchParams.get('id');
+
   const editor = useMapEditor(BLANK_MAP);
   const [showBodyPicker, setShowBodyPicker] = useState(false);
   const [showBasePicker, setShowBasePicker] = useState(false);
+
+  const { data: existingMap } = useMap(mapId);
+  const createMap = useCreateMap();
+  const updateMap = useUpdateMap(mapId ?? '');
+
+  // Load existing map when data arrives
+  useEffect(() => {
+    if (existingMap) editor.loadHexData(existingMap.data);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [existingMap?.id]);
 
   const handleHexClickWithPickers = useCallback(
     (q: number, r: number) => {
@@ -66,6 +81,31 @@ export default function MapEditorPage() {
     });
   }, [editor]);
 
+  const handleSave = useCallback(async () => {
+    if (mapId) {
+      await updateMap.mutateAsync({ data: editor.hexData, name: editor.hexData.meta.name });
+    } else {
+      const created = await createMap.mutateAsync({
+        name: editor.hexData.meta.name,
+        version: editor.hexData.meta.version,
+        data: editor.hexData,
+      });
+      window.history.replaceState(null, '', `/admin/map-editor?id=${created.id}`);
+    }
+    editor.resetDirty();
+  }, [mapId, editor, createMap, updateMap]);
+
+  const handleExport = useCallback(() => {
+    const json = JSON.stringify(editor.hexData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${editor.hexData.meta.name.replace(/\s+/g, '-').toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [editor]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#0a0a1a', color: '#fff' }}>
       {/* Header */}
@@ -74,8 +114,8 @@ export default function MapEditorPage() {
         <span style={{ fontFamily: 'monospace' }}>{editor.hexData.meta.name}</span>
         {editor.dirty && <span style={{ color: '#ffaa44' }}>● unsaved</span>}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          <button>Save</button>
-          <button>Export</button>
+          <button onClick={handleSave} disabled={!editor.dirty}>Save</button>
+          <button onClick={handleExport}>Export</button>
         </div>
       </div>
 
