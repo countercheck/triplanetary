@@ -16,13 +16,14 @@ const { app, router: bgioRouter } = bgioServer;
 
 // Attach app-level middleware to the boardgame.io Koa app
 app.keys = [process.env['SESSION_SECRET'] ?? 'dev-secret-change-me'];
-app.use(bodyParser());
 app.use(createSessionMiddleware(app));
 app.use(passportInit);
 app.use(passportSession);
 
-// Mount custom routes under /api
+// Mount custom routes under /api, with body parsing scoped only to /api
+// to avoid consuming the request body before boardgame.io's own body parser.
 const apiRouter = new Router({ prefix: '/api' });
+apiRouter.use(bodyParser());
 apiRouter.use(authRouter.routes());
 apiRouter.use(healthRouter.routes());
 
