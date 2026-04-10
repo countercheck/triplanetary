@@ -1,0 +1,17 @@
+{
+  "name": "triplanetary",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "db:generate": "turbo run db:generate --filter=@triplanetary/server",
+    "db:migrate": "turbo run db:migrate --filter=@triplanetary/server"
+  },
+  "devDependencies": {
+    "turbo": "^2.9.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "msw"]
+  }
+}
