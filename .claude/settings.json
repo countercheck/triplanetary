@@ -25,7 +25,8 @@
       "Bash(node -e \"const cjs = require\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/boardgame.io@0.50.2/node_modules/boardgame.io/dist/cjs/server.js'\\); const s = cjs.Server\\({ games: [], origins: ['http://localhost:3000'] }\\); s.app.use\\(function\\(ctx, next\\) { return next\\(\\); }\\); console.log\\('koa app.use works'\\)\")",
       "Bash(node -e ':*)",
       "Bash(node -e \"const src = require\\('fs'\\).readFileSync\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/boardgame.io@0.50.2/node_modules/boardgame.io/dist/cjs/server.js', 'utf8'\\); const idx = src.indexOf\\('run\\('\\); console.log\\(src.slice\\(idx, idx+600\\)\\);\")",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "Bash(pnpm --filter @triplanetary/client test)"
     ]
   }
 }
