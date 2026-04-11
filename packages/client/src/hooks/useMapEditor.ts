@@ -61,13 +61,24 @@ export function useMapEditor(initial: HexData): UseMapEditorResult {
           applyHexChange(key, { type: 'gravity', offset: [0, 1], manual: false });
           break;
         case 'weakGravity':
-          setHexData((prev) => ({
-            ...prev,
-            hexes: {
-              ...prev.hexes,
-              [key]: { ...prev.hexes[key], type: 'gravity', weak: true } as HexEntry,
-            },
-          }));
+          setHexData((prev) => {
+            const existingEntry = prev.hexes[key];
+            const nextEntry = {
+              ...existingEntry,
+              type: 'gravity',
+              weak: true,
+              offset: existingEntry?.type === 'gravity' && existingEntry.offset ? existingEntry.offset : [0, 1],
+              manual: existingEntry?.type === 'gravity' && existingEntry.manual !== undefined ? existingEntry.manual : false,
+            } as HexEntry;
+
+            return {
+              ...prev,
+              hexes: {
+                ...prev.hexes,
+                [key]: nextEntry,
+              },
+            };
+          });
           setDirty(true);
           break;
         case 'clandestine':
