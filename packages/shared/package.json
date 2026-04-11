@@ -5,6 +5,8 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
     "dev": "tsc --watch",
     "test": "vitest run"
   },
