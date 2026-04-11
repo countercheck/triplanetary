@@ -5,7 +5,10 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "dev": "tsc --watch",
+    "test": "vitest run"
   },
   "dependencies": {
     "boardgame.io": "^0.50.2"
