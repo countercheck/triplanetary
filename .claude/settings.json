@@ -1,4 +1,35 @@
 {
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/sam/Code/triplanetary/scripts/post-edit-lint.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/sam/Code/triplanetary/scripts/post-edit-lint.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/sam/Code/triplanetary/scripts/post-edit-lint.sh"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(pnpm --filter @triplanetary/server db:migrate)",
@@ -26,7 +57,49 @@
       "Bash(node -e ':*)",
       "Bash(node -e \"const src = require\\('fs'\\).readFileSync\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/boardgame.io@0.50.2/node_modules/boardgame.io/dist/cjs/server.js', 'utf8'\\); const idx = src.indexOf\\('run\\('\\); console.log\\(src.slice\\(idx, idx+600\\)\\);\")",
       "Bash(pnpm add:*)",
-      "Bash(pnpm --filter @triplanetary/client test)"
+      "Bash(pnpm --filter @triplanetary/client test)",
+      "Bash(git check-ignore:*)",
+      "Bash(git worktree:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm --filter @triplanetary/shared test)",
+      "Bash(pnpm --filter @triplanetary/server test -- --reporter=verbose maps)",
+      "Bash(dotenv -e .env -- pnpm --filter @triplanetary/server db:migrate)",
+      "Bash(ln -s /Users/sam/Code/triplanetary/.env /Users/sam/Code/triplanetary/.worktrees/phase-1a-map-editor/.env)",
+      "Bash(pnpm --filter @triplanetary/client test -- AdminGuard)",
+      "Bash(pnpm --filter @triplanetary/client add honeycomb-grid react-zoom-pan-pinch)",
+      "Bash(ls /Users/sam/Code/triplanetary/.worktrees/phase-1a-map-editor/node_modules/.pnpm/honeycomb-grid*/node_modules/honeycomb-grid/dist/)",
+      "Bash(grep -n \"defineHex\\\\|rectangle\\\\|corners\\\\|toPoint\\\\|center\" /Users/sam/Code/triplanetary/.worktrees/phase-1a-map-editor/node_modules/.pnpm/honeycomb-grid*/node_modules/honeycomb-grid/dist/index.d.ts)",
+      "Bash(grep -rn \"rectangle\\\\|defineHex\" /Users/sam/Code/triplanetary/.worktrees/phase-1a-map-editor/node_modules/.pnpm/honeycomb-grid@4.1.5/node_modules/honeycomb-grid/dist/grid/*.d.ts)",
+      "Bash(pnpm --filter @triplanetary/client test -- HexGrid)",
+      "Bash(pnpm --filter @triplanetary/client test -- useMapEditor)",
+      "Bash(pnpm --filter @triplanetary/server db:seed)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create --title 'feat: Phase 1a — Map Editor' --body ':*)",
+      "Bash(gh pr create --head feature/phase-1a-map-editor --base main --title 'feat: Phase 1a — Map Editor' --body ':*)",
+      "Bash(git -C /Users/sam/Code/triplanetary/.worktrees/phase-1a-map-editor status --short)",
+      "Bash(git -C /Users/sam/Code/triplanetary/.worktrees/phase-1a-map-editor add packages/client/package.json pnpm-lock.yaml)",
+      "Bash(git -C /Users/sam/Code/triplanetary/.worktrees/phase-1a-map-editor commit -m \"chore: add honeycomb-grid and react-zoom-pan-pinch dependencies\")",
+      "Bash(git -C /Users/sam/Code/triplanetary/.worktrees/phase-1a-map-editor push)",
+      "Bash(grep -E '\"lint\"' /Users/sam/Code/triplanetary/packages/*/package.json)",
+      "Bash(ls /Users/sam/Code/triplanetary/.eslintrc* /Users/sam/Code/triplanetary/eslint.config*)",
+      "Bash(npx eslint:*)",
+      "Bash(node -e \"const r = require\\('./node_modules/eslint-plugin-react/index.js'\\); console.log\\(Object.keys\\(r.configs || {}\\)\\)\")",
+      "Bash(node --input-type=module -e \"import r from './node_modules/eslint-plugin-react/index.js'; console.log\\(Object.keys\\(r.configs || {}\\)\\)\")",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(pnpm lint:*)",
+      "Bash(node -e \"const {execSync} = require\\('child_process'\\); console.log\\(execSync\\('pnpm --version'\\).toString\\(\\).trim\\(\\)\\)\")",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm --filter @triplanetary/server typecheck)",
+      "Bash(git -C /Users/sam/Code/triplanetary worktree list)",
+      "Bash(git checkout:*)",
+      "Bash(gh pr create --title 'ci: ESLint + typecheck + GitHub Actions CI workflow' --body ':*)",
+      "Bash(git -C /Users/sam/Code/triplanetary status --short)",
+      "Bash(git -C /Users/sam/Code/triplanetary add docs/)",
+      "Bash(git -C /Users/sam/Code/triplanetary commit -m \"docs: add phase-1a map editor implementation plan\")",
+      "Bash(git -C /Users/sam/Code/triplanetary push)",
+      "Bash(git -C /Users/sam/Code/triplanetary pull)",
+      "Bash(chmod +x /Users/sam/Code/triplanetary/scripts/post-edit-lint.sh)"
     ]
   }
 }

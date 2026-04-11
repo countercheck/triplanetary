@@ -10,13 +10,15 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "db:generate": "turbo run db:generate --filter=@triplanetary/server",
-    "db:migrate": "turbo run db:migrate --filter=@triplanetary/server"
+    "db:migrate": "turbo run db:migrate --filter=@triplanetary/server",
+    "prepare": "lefthook install"
   },
   "devDependencies": {
     "eslint": "^9.39.4",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.4.0",
+    "lefthook": "^2.1.5",
     "turbo": "^2.9.5",
     "typescript-eslint": "^8.58.1"
   },
