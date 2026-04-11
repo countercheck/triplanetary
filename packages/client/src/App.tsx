@@ -1,10 +1,12 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthGuard } from './components/AuthGuard';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import LobbyPage from './pages/lobby/LobbyPage';
-import GameRoom from './pages/lobby/GameRoom';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthGuard } from "./components/AuthGuard";
+import { AdminGuard } from "./components/AdminGuard";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import LobbyPage from "./pages/lobby/LobbyPage";
+import GameRoom from "./pages/lobby/GameRoom";
+import MapEditorPage from "./pages/admin/MapEditorPage";
 
 export default function App() {
   return (
@@ -26,6 +28,14 @@ export default function App() {
           <AuthGuard>
             <GameRoom />
           </AuthGuard>
+        }
+      />
+      <Route
+        path="/admin/map-editor"
+        element={
+          <AdminGuard>
+            <MapEditorPage />
+          </AdminGuard>
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />
