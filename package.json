@@ -11,7 +11,7 @@
     "typecheck": "turbo run typecheck",
     "db:generate": "turbo run db:generate --filter=@triplanetary/server",
     "db:migrate": "turbo run db:migrate --filter=@triplanetary/server",
-    "prepare": "lefthook install"
+    "prepare": "if [ -d .git ]; then lefthook install; fi"
   },
   "devDependencies": {
     "eslint": "^9.39.4",
