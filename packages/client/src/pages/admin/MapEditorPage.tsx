@@ -21,7 +21,7 @@ const Q_RANGE: [number, number] = [-12, 14];
 const R_RANGE: [number, number] = [-10, 12];
 
 export default function MapEditorPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const mapId = searchParams.get("id");
 
   const editor = useMapEditor(BLANK_MAP);
@@ -98,11 +98,7 @@ export default function MapEditorPage() {
         version: editor.hexData.meta.version,
         data: editor.hexData,
       });
-      window.history.replaceState(
-        null,
-        "",
-        `/admin/map-editor?id=${created.id}`,
-      );
+      setSearchParams({ id: created.id }, { replace: true });
     }
     editor.resetDirty();
   }, [mapId, editor, createMap, updateMap]);
