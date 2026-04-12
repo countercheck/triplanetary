@@ -1,0 +1,8 @@
+pre-commit:
+  commands:
+    lint:
+      run: pnpm lint
+    test:
+      # Server integration tests require Postgres — run those in CI only.
+      # Pre-commit runs shared and client tests, which are self-contained.
+      run: pnpm --filter @triplanetary/shared test && pnpm --filter @triplanetary/client test

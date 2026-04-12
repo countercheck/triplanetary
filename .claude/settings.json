@@ -1,32 +1,33 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(pnpm --filter @triplanetary/server db:migrate)",
-      "Bash(DATABASE_URL=postgresql://triplanetary:triplanetary@localhost:5432/triplanetary pnpm db:migrate)",
-      "Bash(DATABASE_URL=postgresql://triplanetary:triplanetary@localhost:5432/triplanetary ./node_modules/.bin/drizzle-kit migrate)",
-      "Bash(docker exec:*)",
-      "Bash(pnpm --filter @triplanetary/server test)",
-      "Bash(pnpm view:*)",
-      "Bash(node -e \"import\\('boardgame.io/server'\\).then\\(m => console.log\\(Object.keys\\(m\\)\\)\\)\")",
-      "Bash(node -e \"import\\('boardgame.io/server'\\).then\\(m => { const s = m.Server\\({ games: [] }\\); console.log\\(Object.keys\\(s\\)\\); }\\)\")",
-      "Bash(node -e \"const m = require\\('boardgame.io/server'\\); const s = m.Server\\({ games: [] }\\); console.log\\(Object.keys\\(s\\)\\);\")",
-      "Bash(node -e \"const m = require\\('boardgame.io/server'\\); const s = m.Server\\({ games: [], origins: ['http://localhost:3000'] }\\); console.log\\(s.app.constructor.name\\); console.log\\(typeof s.app.use\\);\")",
-      "Bash(node -e \"const m = require\\('./packages/server/node_modules/boardgame.io/dist/cjs/server.js'\\); const s = m.Server\\({ games: [], origins: ['http://localhost:3000'] }\\); console.log\\(s.app.constructor.name\\); console.log\\(typeof s.app.use\\); console.log\\(typeof s.router\\);\")",
-      "Bash(node -e \"const m = require\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/boardgame.io@0.50.2/node_modules/boardgame.io/dist/cjs/server.js'\\); const s = m.Server\\({ games: [], origins: ['http://localhost:3000'] }\\); console.log\\('app type:', s.app.constructor.name\\); console.log\\('router type:', typeof s.router\\); console.log\\('router keys:', s.router && Object.keys\\(s.router\\).slice\\(0,5\\)\\);\")",
-      "Bash(timeout 8 tsx src/index.ts)",
-      "Bash(pnpm --filter @triplanetary/server exec timeout 8 tsx src/index.ts)",
-      "Bash(curl -s localhost:8000/api/health)",
-      "Bash(curl -s localhost:8000/games)",
-      "Bash(node -e \"const p = require\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/boardgame.io@0.50.2/node_modules/boardgame.io/package.json'\\); console.log\\(JSON.stringify\\(p.exports, null, 2\\)\\)\")",
-      "Bash(node -e \"const p = require\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/boardgame.io@0.50.2/node_modules/boardgame.io/package.json'\\); console.log\\(p.main, p.module, p.types\\)\")",
-      "Read(//private/tmp/**)",
-      "Bash(node -e \"const f = require\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/is-generator-function@1.1.2/node_modules/generator-function/index.js'\\); console.log\\(typeof f, f\\(\\)\\)\")",
-      "Bash(node -e \"const f = require\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/is-generator-function@1.1.2/node_modules/is-generator-function/index.js'\\); console.log\\(f\\(async function\\(\\){}\\), f\\(function*\\(\\){}\\)\\)\")",
-      "Bash(node -e \"const cjs = require\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/boardgame.io@0.50.2/node_modules/boardgame.io/dist/cjs/server.js'\\); const s = cjs.Server\\({ games: [], origins: ['http://localhost:3000'] }\\); s.app.use\\(function\\(ctx, next\\) { return next\\(\\); }\\); console.log\\('koa app.use works'\\)\")",
-      "Bash(node -e ':*)",
-      "Bash(node -e \"const src = require\\('fs'\\).readFileSync\\('/Users/sam/Code/triplanetary/node_modules/.pnpm/boardgame.io@0.50.2/node_modules/boardgame.io/dist/cjs/server.js', 'utf8'\\); const idx = src.indexOf\\('run\\('\\); console.log\\(src.slice\\(idx, idx+600\\)\\);\")",
-      "Bash(pnpm add:*)",
-      "Bash(pnpm --filter @triplanetary/client test)"
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/post-edit-lint.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/post-edit-lint.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/post-edit-lint.sh"
+          }
+        ]
+      }
     ]
   }
 }
