@@ -1,16 +1,25 @@
-import type { BodyEntry, HexEntry } from '../types/map';
+import type { BodyEntry, HexEntry } from "../types/map";
 
 // The 6 axial unit directions for pointy-top hexes.
 // Index order matches the standard hex ring traversal (E, SE, SW, W, NW, NE).
 const AXIAL_DIRS: readonly [number, number][] = [
-  [1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1],
+  [1, 0],
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+  [0, -1],
+  [1, -1],
 ] as const;
 
 /**
  * Returns all hexes on the ring at `radius` distance from `(cq, cr)`.
  * Algorithm: start at (cq, cr-radius), walk 6 sides of `radius` steps each.
  */
-export function hexRing(cq: number, cr: number, radius: number): [number, number][] {
+export function hexRing(
+  cq: number,
+  cr: number,
+  radius: number,
+): [number, number][] {
   if (radius === 0) return [[cq, cr]];
   const results: [number, number][] = [];
   let hq = cq;
@@ -50,8 +59,9 @@ function nearestAxialDir(dq: number, dr: number): [number, number] {
  * Non-manual gravity hexes are dropped and recomputed from scratch.
  *
  * @param bodies   Body definitions with center coordinates and gravityRings radius.
- * @param existing Existing hex entries (may include manual gravity overrides).
- * @returns        New hex record containing only gravity hexes (caller merges with non-gravity hexes).
+ * @param existing Existing hex entries (may include manual gravity overrides and non-gravity hexes).
+ * @returns        Full hex record: all non-gravity entries from existing, manual gravity overrides,
+ *                 and freshly computed non-manual gravity hexes.
  */
 export function computeGravity(
   bodies: Record<string, BodyEntry>,
@@ -60,12 +70,12 @@ export function computeGravity(
   // Carry forward manual overrides only; drop non-manual gravity (will recompute)
   const result: Record<string, HexEntry> = Object.fromEntries(
     Object.entries(existing).filter(
-      ([, h]) => !(h.type === 'gravity' && !h.manual),
+      ([, h]) => !(h.type === "gravity" && !h.manual),
     ),
   );
 
   for (const [bodyName, body] of Object.entries(bodies)) {
-    const parts = body.center.split(',');
+    const parts = body.center.split(",");
     const cq = Number(parts[0]);
     const cr = Number(parts[1]);
 
@@ -75,9 +85,14 @@ export function computeGravity(
         if (result[key]?.manual) continue; // preserve manual override
         // Do not overwrite planet, asteroid, or clandestine hexes with gravity
         const existingHex = result[key];
-        if (existingHex && existingHex.type !== 'gravity') continue;
+        if (existingHex && existingHex.type !== "gravity") continue;
         const offset = nearestAxialDir(cq - hq, cr - hr);
-        result[key] = { type: 'gravity', body: bodyName, offset, manual: false };
+        result[key] = {
+          type: "gravity",
+          body: bodyName,
+          offset,
+          manual: false,
+        };
       }
     }
   }
