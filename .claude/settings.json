@@ -29,5 +29,10 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(ls /Users/sam/Code/triplanetary/node_modules/.pnpm/honeycomb-grid*)"
+    ]
   }
 }

@@ -24,12 +24,11 @@ const pgStore = {
   ) {
     const expireMs =
       typeof maxAge === "number" ? maxAge : 7 * 24 * 60 * 60 * 1000;
-    const expire = new Date(Date.now() + expireMs);
     await pool.query(
       `INSERT INTO session (sid, sess, expire)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (sid) DO UPDATE SET sess = $2, expire = $3`,
-      [key, JSON.stringify(sess), expire],
+       VALUES ($1, $2, NOW() + ($3 * INTERVAL '1 millisecond'))
+       ON CONFLICT (sid) DO UPDATE SET sess = $2, expire = NOW() + ($3 * INTERVAL '1 millisecond')`,
+      [key, JSON.stringify(sess), expireMs],
     );
   },
 
