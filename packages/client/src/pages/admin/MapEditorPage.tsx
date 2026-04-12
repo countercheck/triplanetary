@@ -173,7 +173,7 @@ export default function MapEditorPage() {
             selectedHex={editor.selectedHex}
             hexData={editor.hexData}
             setGravityOverride={editor.setGravityOverride}
-            handleHexClick={editor.handleHexClick}
+            eraseHex={editor.eraseHex}
           />
         </div>
       </div>

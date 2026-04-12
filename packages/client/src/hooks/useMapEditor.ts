@@ -20,6 +20,7 @@ export interface UseMapEditorResult {
   selectedHex: string | null;
   dirty: boolean;
   handleHexClick: (q: number, r: number) => void;
+  eraseHex: (hexKey: string) => void;
   placeBody: (bodyName: string, centerKey: string, body: BodyEntry) => void;
   setGravityOverride: (hexKey: string, offset: [number, number]) => void;
   assignBase: (bodyName: string, side: number) => void;
@@ -179,6 +180,7 @@ export function useMapEditor(initial: HexData): UseMapEditorResult {
     selectedHex,
     dirty,
     handleHexClick,
+    eraseHex: deleteHex,
     placeBody,
     setGravityOverride,
     assignBase,
