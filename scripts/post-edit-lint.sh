@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Code PostToolUse hook — lint the edited file
-# Receives JSON payload on stdin; exits 0 always (lint output is informational)
+# Exits non-zero on lint errors so Claude sees the output and fixes them.
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
