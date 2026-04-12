@@ -4,3 +4,4 @@ dist/
 .turbo/
 *.tsbuildinfo
 .worktrees/
+.claude/settings.local.json
