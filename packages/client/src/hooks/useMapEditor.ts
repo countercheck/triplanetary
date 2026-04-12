@@ -44,7 +44,8 @@ export function useMapEditor(initial: HexData): UseMapEditorResult {
 
   const deleteHex = useCallback((key: string) => {
     setHexData((prev) => {
-      const { [key]: _removed, ...rest } = prev.hexes;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [key]: _omit, ...rest } = prev.hexes;
       return { ...prev, hexes: rest };
     });
     setDirty(true);

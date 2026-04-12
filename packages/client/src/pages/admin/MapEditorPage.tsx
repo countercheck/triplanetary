@@ -101,7 +101,7 @@ export default function MapEditorPage() {
       setSearchParams({ id: created.id }, { replace: true });
     }
     editor.resetDirty();
-  }, [mapId, editor, createMap, updateMap]);
+  }, [mapId, editor, createMap, updateMap, setSearchParams]);
 
   const handleExport = useCallback(() => {
     const json = JSON.stringify(editor.hexData, null, 2);
