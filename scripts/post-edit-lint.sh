@@ -24,5 +24,5 @@ if [[ -z "$FILE" ]]; then
 fi
 
 if [[ "$FILE" =~ \.(ts|tsx)$ ]]; then
-  cd "$ROOT" && pnpm exec eslint "$FILE" --max-warnings=0
+  cd "$ROOT" && pnpm exec eslint --max-warnings=0 -- "$FILE"
 fi
