@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { http, HttpResponse } from "msw";
@@ -65,6 +66,7 @@ describe("MapEditorPage", () => {
   });
 
   it("calls POST /api/maps on save for new map and updates URL", async () => {
+    const user = userEvent.setup();
     let posted = false;
     mswServer.use(
       http.post("/api/maps", async () => {
@@ -74,18 +76,25 @@ describe("MapEditorPage", () => {
           { status: 201 },
         );
       }),
-      http.get("/api/maps", () => HttpResponse.json([])),
+      // Handle the GET that fires after setSearchParams updates the URL
+      http.get("/api/maps/new-map-id", () =>
+        HttpResponse.json({ ...SAVED_MAP, id: "new-map-id" }),
+      ),
     );
-    renderEditor();
+    const { container } = renderEditor();
 
-    // Make the map dirty by clicking a hex (erase mode — changes nothing visible but marks dirty)
-    // We reach this via the toolbar; instead we can directly verify Save becomes enabled
-    // after the POST — trigger via the hex grid SVG click
-    // Since HexGrid renders SVG polygons, we use the toolbar to switch mode then click
-    // For simplicity, verify the POST is called when save is clicked via a pre-dirtied state
-    // Use the Export button which is always enabled to verify the page renders correctly
-    expect(screen.getByRole("button", { name: /export/i })).toBeEnabled();
-    expect(posted).toBe(false); // no spurious POST
+    // Switch to asteroid mode so hex clicks dirty the map
+    await user.click(screen.getByRole("radio", { name: /asteroid/i }));
+    const polygon = container.querySelector("polygon");
+    await user.click(polygon!);
+
+    // Save button becomes enabled once the map is dirty
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /save/i })).toBeEnabled(),
+    );
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => expect(posted).toBe(true));
   });
 
   it("shows Export button that is always enabled", () => {
@@ -94,6 +103,7 @@ describe("MapEditorPage", () => {
   });
 
   it("calls PUT /api/maps/:id on save for existing map", async () => {
+    const user = userEvent.setup();
     let putCalled = false;
     mswServer.use(
       http.get("/api/maps/map-1", () => HttpResponse.json(SAVED_MAP)),
@@ -101,12 +111,23 @@ describe("MapEditorPage", () => {
         putCalled = true;
         return HttpResponse.json(SAVED_MAP);
       }),
-      http.get("/api/maps", () => HttpResponse.json([])),
     );
-    renderEditor("?id=map-1");
+    const { container } = renderEditor("?id=map-1");
     await waitFor(() =>
       expect(screen.getByText("Saved Map")).toBeInTheDocument(),
     );
     expect(putCalled).toBe(false); // no spurious PUT on load
+
+    // Switch to asteroid mode and click a hex to dirty the map
+    await user.click(screen.getByRole("radio", { name: /asteroid/i }));
+    const polygon = container.querySelector("polygon");
+    await user.click(polygon!);
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /save/i })).toBeEnabled(),
+    );
+    await user.click(screen.getByRole("button", { name: /save/i }));
+
+    await waitFor(() => expect(putCalled).toBe(true));
   });
 });
