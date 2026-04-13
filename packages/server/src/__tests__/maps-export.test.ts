@@ -15,14 +15,14 @@ import type { HexData } from "@triplanetary/shared";
 function buildTestApp(): Koa {
   const app = new Koa();
   app.keys = ["test-secret"];
+  app.use(createSessionMiddleware(app));
+  app.use(passportInit);
+  app.use(passportSession);
   const router = new Router();
   const api = new Router({ prefix: "/api" });
   api.use(bodyParser());
   api.use(authRouter.routes());
   api.use(mapsRouter.routes());
-  app.use(createSessionMiddleware(app));
-  app.use(passportInit);
-  app.use(passportSession);
   router.use(api.routes());
   app.use(router.routes());
   return app;
@@ -51,13 +51,11 @@ beforeAll(async () => {
   const app = buildTestApp();
   server = app.listen(0);
 
-  await supertest(server)
-    .post("/api/auth/register")
-    .send({
-      email: "export-test@test.com",
-      password: "pass",
-      displayName: "Exporter",
-    });
+  await supertest(server).post("/api/auth/register").send({
+    email: "export-test@test.com",
+    password: "pass",
+    displayName: "Exporter",
+  });
   await pool.query("UPDATE users SET is_admin = TRUE WHERE email = $1", [
     "export-test@test.com",
   ]);
