@@ -2,6 +2,19 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { SCENARIOS } from '@triplanetary/shared';
+import { apiClient } from '../../lib/apiClient';
+import type { HexData } from '@triplanetary/shared';
+
+interface MapMeta {
+  id: string;
+  name: string;
+  isCanonical: boolean;
+}
+
+interface MapRow {
+  id: string;
+  data: HexData;
+}
 
 interface Match {
   matchID: string;
@@ -17,15 +30,78 @@ async function fetchMatches(): Promise<Match[]> {
   return data.matches ?? [];
 }
 
-async function createMatch(numPlayers: number): Promise<{ matchID: string }> {
-  const res = await fetch('/games/triplanetary/create', {
+async function fetchCanonicalMap(): Promise<HexData | null> {
+  const maps = await apiClient.get<MapMeta[]>('/maps');
+  const canonical = maps.find((m) => m.isCanonical);
+  if (!canonical) return null;
+  const row = await apiClient.get<MapRow>(`/maps/${canonical.id}`);
+  return row.data;
+}
+
+async function createAndJoin(
+  numPlayers: number,
+  mapData: HexData | null,
+  playerName: string,
+): Promise<{ matchID: string }> {
+  // 1. Create match with canonical map as setupData
+  const createRes = await fetch('/games/triplanetary/create', {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ numPlayers }),
+    body: JSON.stringify({ numPlayers, setupData: { mapData } }),
   });
-  if (!res.ok) throw new Error('Failed to create match');
-  return res.json() as Promise<{ matchID: string }>;
+  if (!createRes.ok) throw new Error('Failed to create match');
+  const { matchID } = (await createRes.json()) as { matchID: string };
+
+  // 2. Join as player 0
+  const joinRes = await fetch(`/games/triplanetary/${matchID}/join`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ playerID: '0', playerName }),
+  });
+  if (!joinRes.ok) throw new Error('Failed to join match');
+  const { playerCredentials } = (await joinRes.json()) as { playerCredentials: string };
+
+  // 3. Store credentials in sessionStorage
+  sessionStorage.setItem(
+    `bgio-${matchID}`,
+    JSON.stringify({ playerID: '0', credentials: playerCredentials }),
+  );
+
+  return { matchID };
+}
+
+async function joinExistingMatch(
+  matchID: string,
+  playerName: string,
+): Promise<void> {
+  // Determine free seat
+  const matchRes = await fetch(`/games/triplanetary/${matchID}`, {
+    credentials: 'include',
+  });
+  if (!matchRes.ok) throw new Error('Failed to fetch match');
+  const matchData = (await matchRes.json()) as {
+    players: Array<{ id: number; name?: string }>;
+  };
+
+  const freeSeat = matchData.players.find((p) => !p.name);
+  if (!freeSeat) throw new Error('Match is full');
+  const playerID = String(freeSeat.id);
+
+  const joinRes = await fetch(`/games/triplanetary/${matchID}/join`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ playerID, playerName }),
+  });
+  if (!joinRes.ok) throw new Error('Failed to join match');
+  const { playerCredentials } = (await joinRes.json()) as { playerCredentials: string };
+
+  sessionStorage.setItem(
+    `bgio-${matchID}`,
+    JSON.stringify({ playerID, credentials: playerCredentials }),
+  );
 }
 
 export default function LobbyPage() {
@@ -42,10 +118,23 @@ export default function LobbyPage() {
   const scenario = SCENARIOS.find((s) => s.id === selectedScenario);
 
   const createMutation = useMutation({
-    mutationFn: () => createMatch(scenario?.minPlayers ?? 2),
+    mutationFn: async () => {
+      const mapData = await fetchCanonicalMap();
+      return createAndJoin(scenario?.minPlayers ?? 2, mapData, 'Player 1');
+    },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['matches'] }).catch(() => undefined);
       navigate(`/game/${data.matchID}`);
+    },
+  });
+
+  const joinMutation = useMutation({
+    mutationFn: async (matchID: string) => {
+      await joinExistingMatch(matchID, 'Player 2');
+      return matchID;
+    },
+    onSuccess: (matchID) => {
+      navigate(`/game/${matchID}`);
     },
   });
 
@@ -70,7 +159,12 @@ export default function LobbyPage() {
             <li key={match.matchID}>
               Match {match.matchID.slice(0, 8)}
               {' · '}
-              <button onClick={() => navigate(`/game/${match.matchID}`)}>Join</button>
+              <button
+                onClick={() => joinMutation.mutate(match.matchID)}
+                disabled={joinMutation.isPending}
+              >
+                Join
+              </button>
             </li>
           ))}
         </ul>

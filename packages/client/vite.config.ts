@@ -4,6 +4,9 @@ import { resolve } from "node:path";
 
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    include: ['boardgame.io/react', 'boardgame.io/multiplayer'],
+  },
   resolve: {
     alias: {
       "@triplanetary/shared": resolve("../shared/src/index.ts"),
