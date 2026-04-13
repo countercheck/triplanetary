@@ -58,7 +58,7 @@ jobs:
           exit 1
 
       - name: Run migrations
-        run: pnpm db:migrate
+        run: pnpm --filter @triplanetary/server db:migrate
 
       - name: Lint
         run: pnpm lint
