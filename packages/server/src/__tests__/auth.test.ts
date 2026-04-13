@@ -13,14 +13,14 @@ import { pool } from "../db/client.js";
 function buildTestApp(): Koa {
   const app = new Koa();
   app.keys = ["test-secret"];
-  const router = new Router();
-  app.use(bodyParser());
   app.use(createSessionMiddleware(app));
   app.use(passportInit);
   app.use(passportSession);
-  router.use("/api", authRouter.routes());
-  router.use("/api", healthRouter.routes());
-  app.use(router.routes());
+  const api = new Router({ prefix: "/api" });
+  api.use(bodyParser());
+  api.use(authRouter.routes());
+  api.use(healthRouter.routes());
+  app.use(api.routes());
   return app;
 }
 
@@ -28,16 +28,14 @@ let server: Server;
 let request: ReturnType<typeof supertest>;
 
 beforeAll(async () => {
-  // Clean users table before tests
-  await pool.query("DELETE FROM users");
+  await pool.query("DELETE FROM users WHERE email = 'test@example.com'");
   const app = buildTestApp();
   server = app.listen(0);
   request = supertest(server);
 });
 
-afterAll(async () => {
+afterAll(() => {
   server.close();
-  await pool.end();
 });
 
 describe("POST /api/auth/register", () => {
