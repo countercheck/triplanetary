@@ -115,3 +115,52 @@ pnpm --filter @triplanetary/shared build
 - **Phase 2** — Game engine (vector movement, gravity, combat)
 - **Phase 3** — Lobby refinements, multiplayer polish
 - **Phase 4** — AI bot
+
+---
+
+## Decision Log
+
+Append entries here whenever an architectural, convention, or tooling decision is made.
+
+### Single-port Koa server (boardgame.io + custom routes)
+boardgame.io's built-in Koa server is the only backend process. Custom `/api/*` routes mount directly on its Koa app rather than a separate server. Avoids a second port and proxying complexity. All custom middleware must be Koa-compatible; boardgame.io's internal routing conventions must be respected.
+
+### CommonJS for `shared` and `server` packages
+boardgame.io 0.50.x ships CJS-only with no ESM exports map — any ESM import fails. Do not add `"type": "module"` to `packages/shared` or `packages/server`. `packages/client` is ESM (Vite handles bundling).
+
+### ts-node --transpile-only as server dev runner (not tsx)
+tsx v4's ESM loader pollutes the CJS module cache, causing `TypeError: getGeneratorFunction is not a function` in koa-passport. Do not switch back to `tsx watch`. Note: transpile-only skips type checking at dev-server startup — run `pnpm typecheck` separately.
+
+### bodyParser scoped to /api router
+`koa-bodyparser` at app-level consumes the request stream before boardgame.io's `co-body` parser runs → `InternalServerError: stream is not readable` on match creation. Scope it to the `/api` Router only.
+
+### PostgreSQL on port 5433
+Port 5432 conflicts with a locally installed PostgreSQL. All connection strings and CI service definitions target `:5433`.
+
+### Custom pg session store (not connect-pg-simple)
+connect-pg-simple has CJS/ESM resolution issues in this module setup. Hand-rolled store in `session.ts` using plain `pool.query`. Expire column uses `NOW() + ($n * INTERVAL '1 millisecond')` — passing a JS `Date` into a `timestamp WITHOUT TIME ZONE` column strips timezone and causes `expire > NOW()` comparisons to fail.
+
+### Custom migration runner (not drizzle-kit migrate)
+drizzle-kit's `migrate` CLI fails with CJS/ESM resolution errors. Migrations are applied via `packages/server/src/db/migrate.ts` (run with `tsx`). New migration files must be manually registered in `meta/_journal.json`. CI calls `pnpm --filter @triplanetary/server db:migrate` (bypasses turbo) so `DATABASE_URL` reaches the subprocess.
+
+### Turbo env passthrough: declare env vars in turbo.json
+Turbo v2 does not forward env vars to task subprocesses unless declared under `"env": [...]` in the task config. Any task that reads env vars at runtime must declare them there.
+
+### Vite alias: @triplanetary/shared → TypeScript source
+Vite/Rollup cannot statically analyse `__exportStar` from tsc's CJS output — named exports appear missing at bundle time. `vite.config.ts` aliases `@triplanetary/shared` to `../shared/src/index.ts`. The server still imports from the compiled `dist/`.
+
+### Vitest fork isolation for server integration tests
+`pool: 'forks'` + `poolOptions: { forks: { isolate: true } }` in `packages/server/vitest.config.ts`. Without this, `pool.end()` in one test file's `afterAll` terminates the shared pg Pool used by concurrently-running test files.
+
+### Per-file email namespacing for server integration tests
+Test files run concurrently. A broad `DELETE FROM users` in one file's `beforeAll` races with another file's user registration. Each file owns a unique email prefix and cleans up only its own rows:
+
+| File | Namespace |
+|---|---|
+| `auth.test.ts` | `test@example.com` |
+| `auth-validation.test.ts` | `auth-val-*@test.com` |
+| `maps.test.ts` | `mapeditor-*@test.com` |
+| `maps-export.test.ts` | `export-test@test.com` |
+| `session.test.ts` | `test-session-*` (session table only) |
+
+New integration test files must choose a unique prefix and clean up only that prefix.
