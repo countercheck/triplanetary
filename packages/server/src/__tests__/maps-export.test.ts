@@ -77,7 +77,9 @@ beforeAll(async () => {
 afterAll(async () => {
   await pool.query("DELETE FROM maps WHERE name LIKE 'Export%'");
   await pool.query("DELETE FROM users WHERE email = 'export-test@test.com'");
-  server.close();
+  await new Promise<void>((resolve, reject) => {
+    server.close((err) => (err ? reject(err) : resolve()));
+  });
 });
 
 describe("GET /api/maps/:id/export — filename sanitization", () => {
