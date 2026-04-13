@@ -74,7 +74,9 @@ beforeAll(async () => {
   mapId = row!.id;
 });
 
-afterAll(() => {
+afterAll(async () => {
+  await pool.query("DELETE FROM maps WHERE name LIKE 'Export%'");
+  await pool.query("DELETE FROM users WHERE email = 'export-test@test.com'");
   server.close();
 });
 
