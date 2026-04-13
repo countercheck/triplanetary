@@ -18,13 +18,11 @@ function buildTestApp(): Koa {
   app.use(createSessionMiddleware(app));
   app.use(passportInit);
   app.use(passportSession);
-  const router = new Router();
   const api = new Router({ prefix: "/api" });
   api.use(bodyParser());
   api.use(authRouter.routes());
   api.use(mapsRouter.routes());
-  router.use(api.routes());
-  app.use(router.routes());
+  app.use(api.routes());
   return app;
 }
 

@@ -17,14 +17,12 @@ function buildTestApp(): Koa {
   app.use(createSessionMiddleware(app));
   app.use(passportInit);
   app.use(passportSession);
-  const router = new Router();
   const api = new Router({ prefix: "/api" });
   api.use(bodyParser());
   api.use(authRouter.routes());
   api.use(healthRouter.routes());
   api.use(mapsRouter.routes());
-  router.use(api.routes());
-  app.use(router.routes());
+  app.use(api.routes());
   return app;
 }
 
@@ -44,25 +42,21 @@ beforeAll(async () => {
   anonRequest = supertest(server);
 
   // Register + promote admin
-  await supertest(server)
-    .post("/api/auth/register")
-    .send({
-      email: "mapeditor-admin@test.com",
-      password: "pass",
-      displayName: "Admin",
-    });
+  await supertest(server).post("/api/auth/register").send({
+    email: "mapeditor-admin@test.com",
+    password: "pass",
+    displayName: "Admin",
+  });
   await pool.query("UPDATE users SET is_admin = TRUE WHERE email = $1", [
     "mapeditor-admin@test.com",
   ]);
 
   // Register user
-  await supertest(server)
-    .post("/api/auth/register")
-    .send({
-      email: "mapeditor-user@test.com",
-      password: "pass",
-      displayName: "User",
-    });
+  await supertest(server).post("/api/auth/register").send({
+    email: "mapeditor-user@test.com",
+    password: "pass",
+    displayName: "User",
+  });
 
   // Login via agents (agents persist cookies)
   adminAgent = supertest.agent(server);
