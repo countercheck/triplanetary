@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from "react";
-import { defineHex, Grid, rectangle } from "honeycomb-grid";
+import { defineHex, Grid, rectangle, Orientation } from "honeycomb-grid";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { HexData, HexEntry } from "@triplanetary/shared";
 
@@ -37,7 +37,8 @@ export function HexGrid({
   const grid = useMemo(() => {
     const ProtoHex = defineHex({
       dimensions: hexSize,
-      orientation,
+      orientation:
+        orientation === "pointy" ? Orientation.POINTY : Orientation.FLAT,
       origin: "topLeft",
     });
     return new Grid(
