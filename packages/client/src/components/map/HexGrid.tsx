@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import { defineHex, Grid, rectangle, Orientation } from "honeycomb-grid";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import type { HexData, HexEntry } from "@triplanetary/shared";
@@ -20,6 +20,8 @@ interface Props {
   rRange: [number, number];
   onHexClick: (q: number, r: number) => void;
   selectedHex?: string | null;
+  /** SVG elements rendered inside <svg> after the hex layer */
+  overlays?: React.ReactNode;
 }
 
 export function HexGrid({
@@ -28,6 +30,7 @@ export function HexGrid({
   rRange,
   onHexClick,
   selectedHex,
+  overlays,
 }: Props) {
   const [qMin, qMax] = qRange;
   const [rMin, rMax] = rRange;
@@ -144,6 +147,7 @@ export function HexGrid({
               );
             })}
           </g>
+          {overlays}
         </svg>
       </TransformComponent>
     </TransformWrapper>
