@@ -111,8 +111,9 @@ pnpm --filter @triplanetary/shared build
 ## Phase Status
 
 - **Phase 0** ✅ — Monorepo scaffold, auth, lobby, match creation
-- **Phase 1** — Map Editor + SVG hex map renderer
-- **Phase 2** — Game engine (vector movement, gravity, combat)
+- **Phase 1a** ✅ — Map editor, SVG hex renderer, canonical map seed (merged to main)
+- **Phase 1b** ✅ — Bi-Planetary game engine: vector movement, gravity, simultaneous astrogation, win condition, Board/HUD UI (branch: feature/phase-1b-game-engine)
+- **Phase 2** — Extended scenarios (Triplanetary, combat, ordnance)
 - **Phase 3** — Lobby refinements, multiplayer polish
 - **Phase 4** — AI bot
 
