@@ -95,6 +95,11 @@ describe("MapEditorPage", () => {
     await user.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => expect(posted).toBe(true));
+    // After setSearchParams({ id: "new-map-id" }), useMap fires GET /api/maps/new-map-id
+    // and loads the saved map — confirming the URL was updated
+    await waitFor(() =>
+      expect(screen.getByText("Saved Map")).toBeInTheDocument(),
+    );
   });
 
   it("shows Export button that is always enabled", () => {
