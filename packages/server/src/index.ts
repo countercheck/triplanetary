@@ -1,9 +1,3 @@
-import path from "node:path";
-import { config } from "dotenv";
-
-// Load .env from monorepo root (src/ → server/ → packages/ → root)
-config({ path: path.resolve(__dirname, "../../../.env") });
-
 import bodyParser from "koa-bodyparser";
 import Router from "@koa/router";
 import { bgioServer } from "./bgio/server";
